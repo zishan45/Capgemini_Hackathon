@@ -1,0 +1,534 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,sans-serif)}
+:root{
+  --c-primary:#534AB7;--c-primary-light:#EEEDFE;--c-teal:#0F6E56;--c-teal-light:#E1F5EE;
+  --c-amber:#BA7517;--c-amber-light:#FAEEDA;--c-coral:#993C1D;--c-coral-light:#FAECE7;
+  --c-green:#3B6D11;--c-green-light:#EAF3DE;
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#app{padding:0 0 2rem}
+/* Header */
+.hero{background:linear-gradient(135deg,var(--c-primary) 0%,#26215C 100%);color:#fff;padding:1.5rem 1.25rem;border-radius:var(--border-radius-lg,12px);margin-bottom:1rem}
+.hero h1{font-size:20px;font-weight:500;margin-bottom:4px}
+.hero p{font-size:13px;opacity:.8}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px}
+/* Nav */
+.nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.nav-btn{padding:7px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary,#ccc);border-radius:20px;cursor:pointer;background:var(--color-background-primary,#fff);color:var(--color-text-secondary,#555);transition:all .2s;font-family:inherit}
+.nav-btn.active,.nav-btn:hover{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+/* Cards */
+.card{background:var(--color-background-primary,#fff);border:0.5px solid var(--color-border-tertiary,#e5e5e5);border-radius:var(--border-radius-lg,12px);padding:1rem 1.25rem;margin-bottom:.75rem}
+.card h2{font-size:16px;font-weight:500;color:var(--color-text-primary,#111);margin-bottom:.5rem}
+.card h3{font-size:14px;font-weight:500;margin-bottom:.4rem}
+.card p{font-size:13px;color:var(--color-text-secondary,#555);line-height:1.7}
+/* Section label */
+.sec-label{font-size:11px;font-weight:500;letter-spacing:.05em;color:var(--color-text-tertiary,#888);text-transform:uppercase;margin-bottom:.5rem;padding-left:2px}
+/* Pipeline viz */
+.pipeline{display:flex;align-items:center;gap:0;overflow-x:auto;padding:8px 0;margin:8px 0}
+.pipe-step{background:var(--c-primary-light);border:1px solid var(--c-primary);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;color:var(--c-primary);white-space:nowrap;position:relative;min-width:90px;text-align:center}
+.pipe-arrow{font-size:16px;color:var(--c-primary);padding:0 4px;flex-shrink:0}
+/* Animated pill */
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.live-badge{display:inline-block;background:#e74c3c;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;animation:pulse 2s infinite;margin-left:8px}
+/* MCQ */
+.mcq-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.mcq-counter{font-size:13px;color:var(--color-text-secondary,#555)}
+.mcq-category{font-size:11px;background:var(--c-primary-light);color:var(--c-primary);padding:3px 10px;border-radius:12px;font-weight:500}
+.mcq-q{font-size:14px;font-weight:500;color:var(--color-text-primary,#111);margin-bottom:.75rem;line-height:1.6}
+.mcq-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:.75rem}
+.opt-btn{text-align:left;padding:9px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary,#ddd);border-radius:8px;cursor:pointer;background:var(--color-background-secondary,#f9f9f9);color:var(--color-text-primary,#111);font-family:inherit;transition:all .15s;line-height:1.5}
+.opt-btn:hover:not([disabled]){border-color:var(--c-primary);background:var(--c-primary-light)}
+.opt-btn.correct{background:#EAF3DE;border-color:#3B6D11;color:#27500A}
+.opt-btn.wrong{background:#FCEBEB;border-color:#A32D2D;color:#501313}
+.opt-btn.reveal{background:var(--c-primary-light);border-color:var(--c-primary)}
+.mcq-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mcq-nav button{padding:7px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary,#ddd);border-radius:8px;cursor:pointer;background:var(--color-background-primary,#fff);font-family:inherit;color:var(--color-text-primary,#111);transition:all .15s}
+.mcq-nav button:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.mcq-nav button.primary{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.score-chip{font-size:12px;background:var(--c-green-light);color:var(--c-green);padding:4px 10px;border-radius:20px;font-weight:500}
+.exp{font-size:12px;color:var(--color-text-secondary,#555);background:var(--color-background-secondary,#f5f5f5);border-radius:8px;padding:8px 12px;margin-top:4px;line-height:1.6;border-left:3px solid var(--c-primary)}
+/* Progress bar */
+.prog-wrap{height:6px;background:var(--color-border-tertiary,#eee);border-radius:3px;margin:8px 0 4px;overflow:hidden}
+.prog-bar{height:100%;background:var(--c-primary);border-radius:3px;transition:width .4s}
+/* Grid */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:.75rem}
+.metric{background:var(--color-background-secondary,#f5f5f5);border-radius:var(--border-radius-md,8px);padding:.75rem 1rem}
+.metric .val{font-size:22px;font-weight:500;color:var(--color-text-primary,#111)}
+.metric .lbl{font-size:12px;color:var(--color-text-secondary,#666);margin-bottom:2px}
+/* Tool tag */
+.tool-tag{display:inline-block;background:var(--c-amber-light);color:var(--c-amber);font-size:11px;padding:3px 10px;border-radius:12px;margin:3px 3px 3px 0;font-weight:500}
+.tech-tag{display:inline-block;background:var(--c-teal-light);color:var(--c-teal);font-size:11px;padding:3px 10px;border-radius:12px;margin:3px 3px 3px 0;font-weight:500}
+/* Collapse */
+.topic-head{cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:10px 0}
+.topic-head h3{font-size:14px;font-weight:500}
+.topic-body{font-size:13px;color:var(--color-text-secondary,#555);line-height:1.8;padding-bottom:8px}
+.topic-body ul{padding-left:16px}
+.topic-body li{margin-bottom:4px}
+hr.thin{border:none;border-top:0.5px solid var(--color-border-tertiary,#eee);margin:2px 0}
+/* Anim flow */
+@keyframes flowRight{0%{left:-100%}100%{left:110%}}
+.flow-track{position:relative;height:4px;background:#e5e5e5;border-radius:2px;overflow:hidden;margin:6px 0}
+.flow-dot{position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,var(--c-primary),transparent);border-radius:2px;animation:flowRight 1.8s ease-in-out infinite}
+</style>
+
+<h2 class="sr-only">Capgemini Exceller AgentifAI Buildathon 2026 – Complete Study Guide with 100 MCQs</h2>
+
+<div id="app">
+  <div class="hero">
+    <div style="font-size:11px;opacity:.7;margin-bottom:6px;letter-spacing:.04em">CAPGEMINI EXCELLER</div>
+    <h1>AgentifAI Buildathon 2026 <span class="live-badge">LIVE TODAY</span></h1>
+    <p>Campus Showdown · April 8, 2026 · 7:30 PM · Superset Platform</p>
+    <div class="badge-row">
+      <span class="badge">GenAI &amp; Agentic AI</span>
+      <span class="badge">SQL Phantom</span>
+      <span class="badge">Agent Builder</span>
+      <span class="badge">AI for All – Human, Inclusive, Sustainable</span>
+    </div>
+  </div>
+
+  <div class="nav" id="main-nav">
+    <button class="nav-btn active" onclick="showTab('notes')">📚 Study Notes</button>
+    <button class="nav-btn" onclick="showTab('pipeline')">🔄 Pipelines &amp; Tools</button>
+    <button class="nav-btn" onclick="showTab('mcq')">✅ 100 MCQs</button>
+    <button class="nav-btn" onclick="showTab('tips')">🎯 Exam Tips</button>
+  </div>
+
+  <!-- NOTES TAB -->
+  <div id="tab-notes">
+    <div class="sec-label">Core Study Areas</div>
+    <div class="card" id="notes-card">
+      <div id="topics-list"></div>
+    </div>
+  </div>
+
+  <!-- PIPELINE TAB -->
+  <div id="tab-pipeline" style="display:none">
+    <div class="sec-label">End-to-End Agentic AI Pipeline</div>
+    <div class="card">
+      <div class="pipeline" id="pipeline-viz"></div>
+      <div class="flow-track"><div class="flow-dot"></div></div>
+      <p style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Data flows from ingestion through agent reasoning to output delivery</p>
+    </div>
+    <div class="sec-label">Key Tools &amp; Technologies</div>
+    <div id="tools-grid"></div>
+    <div class="sec-label" style="margin-top:.75rem">GenAI Model Landscape</div>
+    <div class="card">
+      <div id="model-grid"></div>
+    </div>
+  </div>
+
+  <!-- MCQ TAB -->
+  <div id="tab-mcq" style="display:none">
+    <div class="card">
+      <div class="mcq-meta">
+        <div>
+          <span class="mcq-counter" id="q-counter">Question 1 / 100</span>
+        </div>
+        <span class="mcq-category" id="q-cat">GenAI Basics</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width:1%"></div></div>
+      <div class="grid2" style="margin-bottom:.75rem">
+        <div class="metric"><div class="lbl">Score</div><div class="val" id="score-val">0</div></div>
+        <div class="metric"><div class="lbl">Correct</div><div class="val" id="correct-val">0</div></div>
+        <div class="metric"><div class="lbl">Remaining</div><div class="val" id="rem-val">100</div></div>
+      </div>
+      <div class="mcq-q" id="q-text"></div>
+      <div class="mcq-opts" id="q-opts"></div>
+      <div id="q-exp" style="display:none"></div>
+      <div class="mcq-nav">
+        <button onclick="prevQ()">← Prev</button>
+        <button onclick="skipQ()">Skip →</button>
+        <button class="primary" onclick="nextQ()">Next →</button>
+        <button onclick="resetQ()" style="margin-left:auto;font-size:12px">Reset All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPS TAB -->
+  <div id="tab-tips" style="display:none">
+    <div class="card">
+      <h2>Tonight's Game Plan (7:30 PM Showdown)</h2>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem" id="tips-list"></div>
+    </div>
+    <div class="card">
+      <h2>What Capgemini Will Test</h2>
+      <div id="test-areas"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== TOPICS DATA =====
+const topics = [
+  {
+    title:"🤖 Generative AI — Foundations",
+    color:"var(--c-primary)",
+    bg:"var(--c-primary-light)",
+    points:[
+      "Generative AI creates new content (text, images, code, audio) by learning patterns from training data",
+      "Foundation Models: Large pre-trained models fine-tuned for downstream tasks (GPT-4, Gemini, Claude, LLaMA)",
+      "Transformer Architecture: Attention mechanism, encoder-decoder, self-attention heads",
+      "Tokens: Basic units of text; tokenization converts text to numerical IDs",
+      "Embeddings: Dense vector representations capturing semantic meaning",
+      "Training: Pre-training on large corpus → Fine-tuning on task-specific data → RLHF (Reinforcement Learning from Human Feedback)",
+      "Prompt Engineering: Zero-shot, few-shot, chain-of-thought (CoT), retrieval-augmented generation (RAG)",
+      "Hallucination: When LLMs generate factually incorrect but confident outputs",
+      "Temperature &amp; Top-P: Control randomness/creativity in output generation",
+      "Context Window: Maximum tokens an LLM can process in one inference (4K–200K+)"
+    ]
+  },
+  {
+    title:"🧠 Agentic AI — Core Concepts",
+    color:"var(--c-teal)",
+    bg:"var(--c-teal-light)",
+    points:[
+      "Agentic AI: AI systems that autonomously plan, reason, act, and execute multi-step tasks without constant human supervision",
+      "ReAct Framework: Reason → Act → Observe cycle; agent thinks then takes action",
+      "Autonomous Agents: Can call tools, browse the web, write/run code, and self-correct",
+      "Multi-Agent Systems: Multiple specialized agents collaborate (Orchestrator + Sub-agents)",
+      "Tool Calling / Function Calling: LLMs invoking external APIs, databases, or code",
+      "Memory Types: In-context (short-term), external vector DB (long-term), episodic memory",
+      "Planning: Task decomposition (Tree of Thought, Plan-and-Solve), goal hierarchies",
+      "Reflection &amp; Self-critique: Agent evaluates its own output and revises",
+      "Agent Frameworks: LangChain, LangGraph, AutoGen, CrewAI, AgentKit (Capgemini stack)",
+      "Human-in-the-Loop (HITL): Checkpoints where humans approve/override agent actions"
+    ]
+  },
+  {
+    title:"🗄️ SQL &amp; Data Engineering",
+    color:"var(--c-amber)",
+    bg:"var(--c-amber-light)",
+    points:[
+      "SQL Phantom Round: Tests SQL queries, optimization, and data agent integration",
+      "DDL: CREATE, ALTER, DROP, TRUNCATE — defines schema structure",
+      "DML: SELECT, INSERT, UPDATE, DELETE — manipulates data",
+      "Joins: INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF joins",
+      "Subqueries: Scalar, correlated, and derived table subqueries",
+      "Window Functions: ROW_NUMBER(), RANK(), DENSE_RANK(), LAG(), LEAD(), NTILE()",
+      "CTEs (Common Table Expressions): WITH clause for readable recursive queries",
+      "Indexes: B-tree, hash, composite; speed up reads, slow down writes",
+      "Normalization: 1NF → 2NF → 3NF → BCNF; reduce redundancy",
+      "Text-to-SQL: Agentic AI converting natural language to SQL via LLM",
+      "Vector Databases: Pinecone, Weaviate, ChromaDB — store embeddings for semantic search",
+      "RAG Pipeline: Retrieve relevant chunks from DB → augment LLM prompt → generate answer"
+    ]
+  },
+  {
+    title:"☁️ Cloud &amp; IT Infrastructure",
+    color:"var(--c-coral)",
+    bg:"var(--c-coral-light)",
+    points:[
+      "Cloud Providers: AWS (market leader), Azure (Microsoft), GCP (Google) — all support GenAI services",
+      "IaaS / PaaS / SaaS: Infrastructure / Platform / Software as a Service delivery models",
+      "Microservices: Independently deployable services communicating via APIs (REST, gRPC)",
+      "Containers &amp; Kubernetes: Docker containers orchestrated by K8s for scalable AI deployment",
+      "CI/CD: Continuous Integration / Continuous Deployment — automated build, test, deploy pipelines",
+      "Serverless: Functions-as-a-Service (AWS Lambda, Azure Functions) for event-driven AI agents",
+      "API Gateway: Manages, secures, and routes API calls between services and agents",
+      "DevOps + MLOps: MLOps extends DevOps principles to ML model lifecycle management",
+      "Observability: Logging, tracing, metrics (Prometheus, Grafana, OpenTelemetry)",
+      "Security: OAuth 2.0, JWT tokens, RBAC, prompt injection protection in agentic systems"
+    ]
+  },
+  {
+    title:"🏭 Capgemini &amp; Industry Context",
+    color:"var(--c-green)",
+    bg:"var(--c-green-light)",
+    points:[
+      "Capgemini: Global IT services leader; 420,000+ employees across 50+ countries",
+      "Vision 2026: 'AI for All – Human, Inclusive, and Sustainable' — Year of Innovation",
+      "Buildathon Rounds: Campus Showdown → SQL Phantom + Agent Builder → Elevator Pitch → Deep Dive Technical → Finale (May 31)",
+      "Superset Platform: Official platform for team registration and round submissions",
+      "Team Structure: 1 Captain + 5 members from same university; individual scores aggregate to team score",
+      "Capgemini AI portfolio: Applied Innovation Exchange (AIE), Gen AI practice, AI-powered BPO",
+      "Digital Transformation pillars: Cloud-first, AI-augmented, data-driven, sustainable IT",
+      "Key sectors served: BFSI, Healthcare, Retail, Manufacturing, Energy, Public Sector",
+      "Capgemini Exceller: Flagship campus hiring program targeting 2026/2027 graduates",
+      "Partnership model: Capgemini uses Azure OpenAI, AWS Bedrock, Google Vertex AI at enterprise scale"
+    ]
+  }
+];
+
+// ===== MCQ DATA (100 questions) =====
+const mcqs = [
+  // GenAI Basics (1-20)
+  {cat:"GenAI Basics",q:"What is the primary architecture underlying most modern Large Language Models (LLMs)?",opts:["Recurrent Neural Network (RNN)","Convolutional Neural Network (CNN)","Transformer with self-attention","Generative Adversarial Network (GAN)"],ans:2,exp:"Transformers with self-attention mechanisms replaced RNNs as the dominant architecture for LLMs since the 'Attention Is All You Need' paper (2017)."},
+  {cat:"GenAI Basics",q:"What does 'hallucination' mean in the context of LLMs?",opts:["The model crashes due to overload","The model generates factually incorrect but confident text","The model refuses to answer","The model generates very slow responses"],ans:1,exp:"Hallucination refers to LLMs producing plausible-sounding but factually wrong or fabricated information."},
+  {cat:"GenAI Basics",q:"What is 'few-shot prompting'?",opts:["Training the model on a few examples","Providing 2-5 examples in the prompt before the actual query","Running the model on minimal hardware","Reducing model parameters"],ans:1,exp:"Few-shot prompting gives the LLM 2-5 examples within the prompt so it can infer the pattern and apply it to the actual task."},
+  {cat:"GenAI Basics",q:"What does RAG stand for in AI?",opts:["Rapid AI Generation","Retrieval-Augmented Generation","Random Agent Grounding","Recursive Attention Generation"],ans:1,exp:"RAG (Retrieval-Augmented Generation) retrieves relevant context from a knowledge base and injects it into the LLM prompt to improve accuracy."},
+  {cat:"GenAI Basics",q:"What is the 'context window' of an LLM?",opts:["The GUI window of the AI app","Maximum tokens the model can process in one inference","The training data size","The number of parameters in the model"],ans:1,exp:"The context window defines how many tokens (input + output) an LLM can handle in a single call — ranging from 4K to 200K+ tokens in modern models."},
+  {cat:"GenAI Basics",q:"Which parameter controls randomness/creativity in LLM output?",opts:["Learning rate","Batch size","Temperature","Dropout rate"],ans:2,exp:"Temperature (0–2) controls output randomness. Low values = deterministic, high values = creative/random."},
+  {cat:"GenAI Basics",q:"What is 'Chain-of-Thought' (CoT) prompting?",opts:["Connecting multiple LLMs in series","Asking the model to show step-by-step reasoning before answering","Chaining database queries","Using blockchain for AI verification"],ans:1,exp:"CoT prompting instructs the LLM to reason through a problem step-by-step, significantly improving performance on complex tasks."},
+  {cat:"GenAI Basics",q:"What are 'embeddings' in NLP?",opts:["Compressed image files","Dense vector representations capturing semantic meaning of text","Database foreign keys","CSS styling properties"],ans:1,exp:"Embeddings are numerical vector representations of text where semantically similar words/sentences are close in vector space."},
+  {cat:"GenAI Basics",q:"RLHF stands for?",opts:["Reinforcement Learning for Human Feedback","Reinforced LLM Hallucination Fix","Reinforcement Learning from Human Feedback","Recursive Learning with Human Filters"],ans:2,exp:"RLHF aligns LLMs with human preferences by training a reward model on human ratings and using RL to optimize the LLM towards it."},
+  {cat:"GenAI Basics",q:"Which of these is a foundation model developed by Meta?",opts:["GPT-4","Gemini","LLaMA","Claude"],ans:2,exp:"LLaMA (Large Language Model Meta AI) is Meta's open-weight foundation model family, widely used for fine-tuning."},
+  {cat:"GenAI Basics",q:"What is 'fine-tuning' in the context of LLMs?",opts:["Adjusting the app's font size","Further training a pre-trained model on task-specific data","Cleaning training data","Deploying the model to production"],ans:1,exp:"Fine-tuning adapts a pre-trained foundation model to a specific domain or task using a smaller, targeted dataset."},
+  {cat:"GenAI Basics",q:"What does 'top-p' (nucleus sampling) control in LLM generation?",opts:["The number of output paragraphs","The probability mass from which tokens are sampled","The maximum response length","The model's memory usage"],ans:1,exp:"Top-p sampling picks from the smallest set of tokens whose cumulative probability exceeds p, balancing diversity and quality."},
+  {cat:"GenAI Basics",q:"Which company developed the GPT series of models?",opts:["Google","Anthropic","OpenAI","Microsoft"],ans:2,exp:"OpenAI developed the GPT (Generative Pre-trained Transformer) series, including GPT-3, GPT-4, etc."},
+  {cat:"GenAI Basics",q:"What is a 'prompt' in the context of LLMs?",opts:["A system alert message","The input text given to an LLM to generate a response","A model parameter","A database query"],ans:1,exp:"A prompt is the input text or instruction provided to an LLM, which guides what the model generates."},
+  {cat:"GenAI Basics",q:"What is 'zero-shot prompting'?",opts:["Asking the model with no examples or demonstrations","Training from scratch","Using zero GPU memory","Disabling the model's memory"],ans:0,exp:"Zero-shot prompting asks the LLM to perform a task without providing any examples, relying solely on its pre-trained knowledge."},
+  {cat:"GenAI Basics",q:"Which metric measures how similar two text embeddings are?",opts:["Euclidean distance only","Cosine similarity","Hamming distance","Levenshtein distance"],ans:1,exp:"Cosine similarity measures the angle between embedding vectors — commonly used in semantic search and RAG retrieval."},
+  {cat:"GenAI Basics",q:"What is 'model quantization'?",opts:["Measuring model accuracy","Reducing model size by using lower-precision numbers","Training on quantum computers","Counting model parameters"],ans:1,exp:"Quantization reduces model precision (e.g., FP32→INT8) to decrease size and increase inference speed with minimal accuracy loss."},
+  {cat:"GenAI Basics",q:"Anthropic's AI assistant is called?",opts:["GPT","Gemini","Claude","Copilot"],ans:2,exp:"Anthropic developed Claude, their AI assistant known for safety-focused design and long context windows."},
+  {cat:"GenAI Basics",q:"What is the 'system prompt' in an LLM API call?",opts:["The server startup command","Instructions that define the AI's persona/behavior before user messages","The model's training script","A SQL query for data retrieval"],ans:1,exp:"The system prompt sets the AI's role, persona, constraints, and behavior — it's invisible to end users but shapes all responses."},
+  {cat:"GenAI Basics",q:"What does 'multimodal AI' refer to?",opts:["AI running on multiple servers","AI that processes multiple data types (text, images, audio, video)","AI with multiple personalities","Multi-threaded AI processing"],ans:1,exp:"Multimodal AI models like GPT-4o and Gemini can process and generate content across text, images, audio, and video."},
+  // Agentic AI (21-40)
+  {cat:"Agentic AI",q:"What is an 'AI Agent'?",opts:["A human who tests AI systems","An AI system that autonomously plans and executes multi-step tasks","A simple chatbot with a fixed script","An AI model without any training"],ans:1,exp:"AI Agents autonomously perceive their environment, reason about goals, take actions (tool calls), and adapt based on feedback."},
+  {cat:"Agentic AI",q:"What does the ReAct framework stand for?",opts:["Reason and Code","Reactive AI Components","Reasoning + Acting","Reliable AI Chains of Thought"],ans:2,exp:"ReAct (Reasoning + Acting) interleaves thought steps and action steps, allowing agents to reason about what action to take next."},
+  {cat:"Agentic AI",q:"What is 'tool calling' or 'function calling' in agentic AI?",opts:["Installing software tools","LLMs invoking external APIs, databases, or code executors","Calling a human support agent","A debugging technique"],ans:1,exp:"Tool/function calling allows LLMs to invoke pre-defined functions (APIs, DB queries, calculators) and receive their output."},
+  {cat:"Agentic AI",q:"Which framework is widely used to build agentic LLM applications?",opts:["TensorFlow","LangChain","Hadoop","Apache Spark"],ans:1,exp:"LangChain is the most popular framework for building agentic LLM apps, providing chains, agents, memory, and tool integrations."},
+  {cat:"Agentic AI",q:"What is a 'Multi-Agent System'?",opts:["A single AI agent with multiple identities","Multiple specialized AI agents collaborating to complete complex tasks","An AI running on multiple GPUs","A human team using AI tools"],ans:1,exp:"Multi-Agent Systems deploy multiple specialized agents (e.g., researcher + coder + critic) that collaborate and share results."},
+  {cat:"Agentic AI",q:"What is 'Human-in-the-Loop' (HITL) in agentic AI?",opts:["A human manually writing all AI outputs","Checkpoints where humans review/approve agent actions before proceeding","Humans monitoring AI 24/7","Replacing AI with humans"],ans:1,exp:"HITL maintains human oversight at key decision points, allowing approval or redirection of agent actions for safety and accuracy."},
+  {cat:"Agentic AI",q:"CrewAI is used for?",opts:["Customer relationship management","Orchestrating role-based multi-agent workflows","Cloud resource monitoring","Cybersecurity incident response"],ans:1,exp:"CrewAI is a framework for creating role-based multi-agent 'crews' where each agent has a specific role, goal, and backstory."},
+  {cat:"Agentic AI",q:"What type of memory allows an agent to remember past conversations long-term?",opts:["In-context (prompt) memory","RAM memory","External vector database memory","Session cookies"],ans:2,exp:"External vector databases (Pinecone, ChromaDB) store embeddings of past interactions, enabling long-term persistent memory for agents."},
+  {cat:"Agentic AI",q:"What is 'prompt injection' in agentic AI?",opts:["Adding extra prompts to improve output","Malicious instructions hidden in external content that hijack agent behavior","Injecting training data","A debugging technique"],ans:1,exp:"Prompt injection is an attack where malicious text in agent inputs (e.g., web pages) overrides the original instructions."},
+  {cat:"Agentic AI",q:"The 'Orchestrator' agent in a multi-agent system is responsible for?",opts:["Storing embeddings","Coordinating and delegating tasks to sub-agents","Writing code","Handling user authentication"],ans:1,exp:"The orchestrator agent manages the overall workflow, breaks down goals, and delegates subtasks to specialized sub-agents."},
+  {cat:"Agentic AI",q:"What is 'Tree of Thought' (ToT) prompting?",opts:["A hierarchical data structure for storing prompts","Exploring multiple reasoning paths simultaneously before selecting the best","A decision tree ML model","A visualization tool for LLM outputs"],ans:1,exp:"Tree of Thought lets the LLM explore multiple solution branches simultaneously, using search algorithms to find the optimal path."},
+  {cat:"Agentic AI",q:"AutoGen is a framework developed by?",opts:["Google","Meta","Microsoft Research","Anthropic"],ans:2,exp:"AutoGen is Microsoft Research's framework for building multi-agent conversational AI applications with customizable roles."},
+  {cat:"Agentic AI",q:"What does an agent do in the 'Observe' step of the ReAct loop?",opts:["Takes an action in the environment","Processes the output/result from the action it just took","Generates the final answer","Selects a tool to use"],ans:1,exp:"After acting (calling a tool), the agent observes the result and uses it as context for its next reasoning step."},
+  {cat:"Agentic AI",q:"What is 'self-reflection' in AI agents?",opts:["The agent looking at itself in a mirror","The agent evaluating and critiquing its own output to improve it","A type of model training","A user interface feature"],ans:1,exp:"Self-reflection allows agents to critique their outputs, identify errors, and refine their responses — improving answer quality."},
+  {cat:"Agentic AI",q:"LangGraph extends LangChain for?",opts:["Graph database integration","Building stateful, multi-actor agentic workflows as graphs","Visualizing ML model graphs","Network topology mapping"],ans:1,exp:"LangGraph models agent workflows as directed graphs (nodes = agents/functions, edges = transitions), enabling complex stateful multi-agent flows."},
+  {cat:"Agentic AI",q:"What is a 'vector database' primarily used for in agentic AI?",opts:["Storing traditional relational data","Storing and searching high-dimensional embeddings for semantic retrieval","Managing agent task queues","Code versioning"],ans:1,exp:"Vector databases store embeddings and support similarity search, enabling agents to retrieve relevant context efficiently (core to RAG)."},
+  {cat:"Agentic AI",q:"What is 'task decomposition' in agentic planning?",opts:["Breaking a hardware task into software","Breaking a complex goal into smaller, manageable subtasks","Parallel database queries","Splitting a model into smaller models"],ans:1,exp:"Task decomposition allows agents to handle complex goals by breaking them into sequential or parallel subtasks with clear steps."},
+  {cat:"Agentic AI",q:"Which of these is NOT a typical tool available to an AI agent?",opts:["Web search","Code execution","Generating random human DNA","Database query (Text-to-SQL)"],ans:2,exp:"Agents can use web search, code execution, SQL, APIs — but generating human DNA is not a software tool category."},
+  {cat:"Agentic AI",q:"What is 'episodic memory' in AI agents?",opts:["Short-term in-context memory","Memory of specific past episodes/events to inform future decisions","Memory chips in AI hardware","An audio-visual memory module"],ans:1,exp:"Episodic memory stores records of specific past interactions and outcomes, allowing agents to learn from experience."},
+  {cat:"Agentic AI",q:"Pinecone, Weaviate, and ChromaDB are examples of?",opts:["SQL databases","NoSQL document stores","Vector databases","Message queues"],ans:2,exp:"These are vector databases designed to store and efficiently search high-dimensional embeddings — essential for RAG systems."},
+  // SQL (41-60)
+  {cat:"SQL & Data",q:"What SQL clause is used to filter groups after GROUP BY?",opts:["WHERE","FILTER","HAVING","ORDER BY"],ans:2,exp:"HAVING filters groups produced by GROUP BY, while WHERE filters individual rows before grouping."},
+  {cat:"SQL & Data",q:"Which window function assigns a unique sequential integer to rows within a partition?",opts:["RANK()","DENSE_RANK()","ROW_NUMBER()","NTILE()"],ans:2,exp:"ROW_NUMBER() assigns a unique sequential number to every row within a partition, with no gaps or ties."},
+  {cat:"SQL & Data",q:"What is a CTE (Common Table Expression)?",opts:["A type of database index","A temporary named result set defined with WITH clause","A cloud table extension","A SQL encryption method"],ans:1,exp:"CTEs (WITH clause) create readable, temporary named results that can be referenced in subsequent SQL statements, including recursive queries."},
+  {cat:"SQL & Data",q:"Which JOIN returns all rows from both tables regardless of match?",opts:["INNER JOIN","LEFT JOIN","RIGHT JOIN","FULL OUTER JOIN"],ans:3,exp:"FULL OUTER JOIN returns all rows from both tables — matched rows are combined, unmatched rows show NULL on the missing side."},
+  {cat:"SQL & Data",q:"What does normalization achieve in database design?",opts:["Faster SELECT queries","Eliminating data redundancy and ensuring data integrity","Increasing storage usage","Speeding up JOIN operations"],ans:1,exp:"Normalization (1NF→2NF→3NF→BCNF) reduces data redundancy and dependency, ensuring each fact is stored in exactly one place."},
+  {cat:"SQL & Data",q:"Which function returns the previous row's value in a window?",opts:["LEAD()","PREV()","LAG()","OFFSET()"],ans:2,exp:"LAG() accesses a previous row's value within the same result set window — useful for period-over-period comparisons."},
+  {cat:"SQL & Data",q:"What is a correlated subquery?",opts:["A subquery that returns multiple columns","A subquery that references columns from the outer query","A subquery joined to another subquery","A recursive SQL query"],ans:1,exp:"A correlated subquery references columns from the outer query — it's executed once per row of the outer query."},
+  {cat:"SQL & Data",q:"In SQL, TRUNCATE vs DELETE — key difference?",opts:["No difference","TRUNCATE is faster, cannot be rolled back in many DBs, removes all rows","DELETE is DDL, TRUNCATE is DML","TRUNCATE supports WHERE clause"],ans:1,exp:"TRUNCATE removes all rows instantly without logging each row (faster), typically cannot be rolled back, while DELETE is logged/rollback-friendly."},
+  {cat:"SQL & Data",q:"What does the SQL EXPLAIN keyword do?",opts:["Documents the query","Shows the query execution plan chosen by the optimizer","Runs the query in verbose mode","Explains the table schema"],ans:1,exp:"EXPLAIN (or EXPLAIN ANALYZE) shows how the database engine plans to execute a query — crucial for performance optimization."},
+  {cat:"SQL & Data",q:"Which index type is best for equality lookups?",opts:["B-tree index","Hash index","Full-text index","Bitmap index"],ans:1,exp:"Hash indexes are optimal for exact equality lookups (=) but don't support range queries, while B-tree supports both."},
+  {cat:"SQL & Data",q:"What is 'Text-to-SQL' in agentic AI?",opts:["Converting SQL to plain text","Using an LLM to convert natural language questions into SQL queries","A SQL text formatting tool","Encrypting SQL queries"],ans:1,exp:"Text-to-SQL uses LLMs to translate natural language (e.g., 'Show top 10 customers by revenue') into executable SQL — a key agentic tool."},
+  {cat:"SQL & Data",q:"RANK() vs DENSE_RANK() — what's the difference?",opts:["RANK() handles NULLs, DENSE_RANK() doesn't","RANK() leaves gaps after ties, DENSE_RANK() does not","DENSE_RANK() is faster","No difference"],ans:1,exp:"With ties, RANK() skips numbers (1,2,2,4) while DENSE_RANK() doesn't (1,2,2,3)."},
+  {cat:"SQL & Data",q:"What is a composite index?",opts:["An index on multiple columns","An index that compresses data","An index for JSON columns","A partitioned index"],ans:0,exp:"A composite (multi-column) index covers multiple columns — most effective when queries filter or sort by those columns in order."},
+  {cat:"SQL & Data",q:"Which SQL statement would you use to create a new table?",opts:["INSERT TABLE","CREATE TABLE","NEW TABLE","MAKE TABLE"],ans:1,exp:"CREATE TABLE is a DDL statement that defines a new table structure including columns, data types, and constraints."},
+  {cat:"SQL & Data",q:"What does NTILE(4) do in a window function?",opts:["Divides rows into 4 equal groups (quartiles)","Returns the 4th row","Calculates 4th percentile","Rounds to 4 decimal places"],ans:0,exp:"NTILE(n) divides the result set into n equal buckets and assigns a bucket number — used for quartiles, deciles, etc."},
+  {cat:"SQL & Data",q:"Which type of database is best for storing AI embeddings?",opts:["Relational SQL database","Key-value store","Vector database","Graph database"],ans:2,exp:"Vector databases (Pinecone, Weaviate, ChromaDB) are optimized for high-dimensional vector storage and approximate nearest neighbor search."},
+  {cat:"SQL & Data",q:"What is database sharding?",opts:["Deleting old records","Horizontally partitioning data across multiple database instances","Encrypting database backups","Splitting a table into views"],ans:1,exp:"Sharding distributes data horizontally across multiple databases — each shard holds a subset of data, enabling horizontal scaling."},
+  {cat:"SQL & Data",q:"What SQL aggregate function returns the number of rows?",opts:["SUM()","AVG()","COUNT()","MAX()"],ans:2,exp:"COUNT(*) returns total rows; COUNT(column) counts non-NULL values in that column."},
+  {cat:"SQL & Data",q:"In a RAG pipeline, what is the 'retrieval' step?",opts:["Training the LLM","Fetching relevant document chunks from a vector store using semantic similarity","Generating the final answer","Indexing the vector database"],ans:1,exp:"Retrieval searches the vector database for chunks semantically similar to the user query — these are injected into the LLM prompt."},
+  {cat:"SQL & Data",q:"Which constraint ensures no duplicate values in a column?",opts:["NOT NULL","FOREIGN KEY","UNIQUE","CHECK"],ans:2,exp:"The UNIQUE constraint ensures all values in a column (or combination) are distinct across all rows."},
+  // Cloud & IT (61-75)
+  {cat:"Cloud & IT",q:"What is 'serverless computing'?",opts:["Computing without any servers","Event-driven cloud functions where the provider manages infrastructure","AI that doesn't need power","Computing without software"],ans:1,exp:"Serverless (e.g., AWS Lambda) runs code in response to events without managing servers — auto-scales and charges only per execution."},
+  {cat:"Cloud & IT",q:"What does 'CI/CD' stand for?",opts:["Cloud Infrastructure / Cloud Deployment","Continuous Integration / Continuous Deployment","Code Intelligence / Code Deployment","Customer Interface / Customer Design"],ans:1,exp:"CI/CD automates code testing (CI) and release to production (CD) — enabling fast, reliable software delivery."},
+  {cat:"Cloud & IT",q:"Which cloud service model provides the most control to the user?",opts:["SaaS","PaaS","IaaS","FaaS"],ans:2,exp:"IaaS (Infrastructure as a Service) provides raw VMs, storage, and networking — users manage OS, runtime, and apps."},
+  {cat:"Cloud & IT",q:"What is Kubernetes used for?",opts:["Database management","Container orchestration (deploying, scaling, managing containers)","Code editing","Network security"],ans:1,exp:"Kubernetes (K8s) automates deployment, scaling, load balancing, and self-healing of containerized applications."},
+  {cat:"Cloud & IT",q:"What is an API Gateway?",opts:["A physical network gateway","A service that manages, routes, authenticates, and rate-limits API calls","A database connection pool","A code deployment tool"],ans:1,exp:"API Gateways act as the front door for microservices — handling authentication, routing, rate limiting, and monitoring."},
+  {cat:"Cloud & IT",q:"What is 'MLOps'?",opts:["Machine Learning Operating System","Applying DevOps practices (CI/CD, monitoring, versioning) to ML model lifecycle","A cloud ML service","Multi-Layer Operations"],ans:1,exp:"MLOps extends DevOps to manage the ML lifecycle: data versioning, model training, deployment, monitoring, and retraining."},
+  {cat:"Cloud & IT",q:"Docker is primarily used for?",opts:["Database backup","Containerizing applications for consistent deployment across environments","Network monitoring","Code version control"],ans:1,exp:"Docker packages apps and dependencies into containers — ensuring consistency from development to production across any environment."},
+  {cat:"Cloud & IT",q:"What is 'OAuth 2.0'?",opts:["An AI optimization algorithm","An authorization framework allowing secure delegated access","A database query language","A containerization technology"],ans:1,exp:"OAuth 2.0 is the industry-standard protocol for secure, delegated authorization — used by Google, Microsoft, and most AI APIs."},
+  {cat:"Cloud & IT",q:"What cloud service does Azure OpenAI provide?",opts:["Azure's own AI models","Access to OpenAI's GPT and DALL-E models hosted on Azure infrastructure","Azure DevOps automation","Azure database service"],ans:1,exp:"Azure OpenAI Service provides enterprise-grade access to OpenAI models (GPT-4, DALL-E, Whisper) with Azure security and compliance."},
+  {cat:"Cloud & IT",q:"What is 'observability' in software systems?",opts:["User behavior analytics","The ability to understand a system's internal state through logs, metrics, and traces","Physical observation of servers","UI monitoring"],ans:1,exp:"Observability (logs, metrics, traces) lets teams understand what's happening inside complex distributed systems — critical for AI agent monitoring."},
+  {cat:"Cloud & IT",q:"REST vs GraphQL — key difference?",opts:["REST is newer than GraphQL","REST uses fixed endpoints per resource; GraphQL uses a single endpoint with flexible queries","GraphQL is only for mobile apps","No practical difference"],ans:1,exp:"REST has multiple endpoints returning fixed data shapes; GraphQL has one endpoint where clients specify exactly what data they need."},
+  {cat:"Cloud & IT",q:"What does 'horizontal scaling' mean?",opts:["Adding more CPUs to one server","Adding more servers to distribute load","Making servers taller","Increasing storage capacity"],ans:1,exp:"Horizontal scaling (scale out) adds more server instances to handle increased load — preferred for cloud-native AI applications."},
+  {cat:"Cloud & IT",q:"Which tool is commonly used for AI model experiment tracking?",opts:["Jira","MLflow / Weights & Biases","Slack","Kubernetes"],ans:1,exp:"MLflow and Weights & Biases (W&B) track ML experiments — logging parameters, metrics, artifacts, and model versions."},
+  {cat:"Cloud & IT",q:"What is a 'microservice'?",opts:["A very small software company","A small, independently deployable service that does one thing well","A mobile app feature","A mini-database"],ans:1,exp:"Microservices break applications into small, independent services communicating via APIs — enabling independent scaling and deployment."},
+  {cat:"Cloud & IT",q:"AWS Bedrock is?",opts:["AWS's data warehouse service","A fully managed service to access foundation models from multiple AI providers via API","AWS's blockchain service","An AWS networking tool"],ans:1,exp:"AWS Bedrock provides serverless access to foundation models (Anthropic Claude, Meta LLaMA, Amazon Titan) with enterprise security."},
+  // Capgemini & Industry (76-90)
+  {cat:"Capgemini & Industry",q:"Capgemini's theme for the AgentifAI Buildathon 2026 is?",opts:["Code for the Future","AI for All – Human, Inclusive, and Sustainable","Digital First 2026","Innovation Without Limits"],ans:1,exp:"Capgemini's 2026 vision centers on 'AI for All – Human, Inclusive, and Sustainable' — guiding the Year of Innovation."},
+  {cat:"Capgemini & Industry",q:"The Campus Showdown is conducted on which platform?",opts:["HackerRank","CodeChef","Superset","LeetCode"],ans:2,exp:"Capgemini uses the Superset platform for team registration, round management, and quiz delivery."},
+  {cat:"Capgemini & Industry",q:"How many members can a team have in the Capgemini Buildathon?",opts:["3 members","4 members","6 members (1 captain + 5)","10 members"],ans:2,exp:"Each team has 6 members: 1 Captain who registers and invites 5 members from the same university."},
+  {cat:"Capgemini & Industry",q:"What is the Capgemini Exceller program primarily for?",opts:["Experienced professionals","Campus freshers hiring from engineering institutes (2026/27 batch)","MBA students only","Government employee training"],ans:1,exp:"Capgemini Exceller targets fresh engineering graduates (2026/2027 batch) for Software Engineer roles across India."},
+  {cat:"Capgemini & Industry",q:"The SQL Phantom + Agent Builder round follows which round?",opts:["Elevator Pitch","Deep Dive Technical","Campus Showdown (Quiz)","Finale Presentation"],ans:2,exp:"The Campus Showdown (Quiz on April 8) is Round 0. Top performers advance to SQL Phantom + Agent Builder."},
+  {cat:"Capgemini & Industry",q:"Capgemini has approximately how many employees worldwide?",opts:["50,000+","150,000+","420,000+","1 million+"],ans:2,exp:"Capgemini has 420,000+ team members across 50+ countries — making it one of the world's largest IT services firms."},
+  {cat:"Capgemini & Industry",q:"What is the finale round of the Buildathon?",opts:["Online quiz","In-person presentation before Capgemini senior executives","Virtual hackathon","SQL coding challenge"],ans:1,exp:"The Finale (May 31, 2026) is an in-person presentation before Capgemini senior executives and industry professionals."},
+  {cat:"Capgemini & Industry",q:"What does Capgemini's Applied Innovation Exchange (AIE) focus on?",opts:["Hiring only AI engineers","Rapid prototyping and innovation of AI solutions with enterprise clients","Managing Capgemini's cloud infrastructure","Providing AI chatbots to clients"],ans:1,exp:"AIE is Capgemini's global network of labs for rapid prototyping, co-innovation, and proof-of-concept development with clients."},
+  {cat:"Capgemini & Industry",q:"In the Elevator Pitch round, what do teams present?",opts:["A working code prototype","A concise idea pitch for their AI solution within a short time frame","A database schema","A business plan document"],ans:1,exp:"The Elevator Pitch round requires teams to present their AI solution idea clearly and compellingly in a limited timeframe — assessed for clarity and innovation."},
+  {cat:"Capgemini & Industry",q:"Which graduating batches are eligible for the Buildathon?",opts:["2024 and 2025 batch","2025 and 2026 batch","2026 and 2027 batch","2027 and 2028 batch"],ans:2,exp:"The Buildathon is open only to students from the 2026 and 2027 graduating batches of Capgemini partner institutions."},
+  {cat:"Capgemini & Industry",q:"'Digital transformation' at Capgemini is built on which pillars?",opts:["Cloud, AI, Data, Sustainability","Hardware, Software, Networking","Sales, Marketing, Finance","Consulting only"],ans:0,exp:"Capgemini's transformation pillars are cloud-first, AI-augmented, data-driven, and sustainable IT — applied across all industry verticals."},
+  {cat:"Capgemini & Industry",q:"Side Quests in the Buildathon are?",opts:["Optional fun mini-challenges that contribute to the leaderboard","Required coding challenges","SQL exercises","Physical activities"],ans:0,exp:"Side Quests are engaging mini-challenges (quizzes, interactive tasks) throughout the event that earn extra leaderboard points and prizes."},
+  {cat:"Capgemini & Industry",q:"Capgemini's main cloud hyperscaler partnerships include?",opts:["Only AWS","Only Azure","AWS, Azure (Microsoft), and Google Cloud","IBM only"],ans:2,exp:"Capgemini has strategic partnerships with AWS, Microsoft Azure, and Google Cloud, deploying GenAI services across all three."},
+  {cat:"Capgemini & Industry",q:"What minimum academic percentage is required for Capgemini Exceller?",opts:["50%","55%","60%","70%"],ans:2,exp:"Capgemini Exceller requires a minimum of 60% marks throughout 10th, 12th, and graduation."},
+  {cat:"Capgemini & Industry",q:"Individual scores in the Campus Showdown contribute to?",opts:["Only individual rankings","The team's overall score","A separate personal leaderboard","Nothing — only the captain's score counts"],ans:1,exp:"Each team member's individual quiz score aggregates to form the team's total score — so every member's performance matters."},
+  // Mixed Advanced (91-100)
+  {cat:"Advanced AI",q:"What is 'Responsible AI'?",opts:["AI that responds quickly","AI developed and deployed with ethical principles: fairness, accountability, transparency, safety","AI built only for responsible companies","Legally compliant AI licensing"],ans:1,exp:"Responsible AI ensures systems are fair, explainable, safe, and accountable — Capgemini's 'AI for All' theme is grounded in this."},
+  {cat:"Advanced AI",q:"What is 'model distillation'?",opts:["Extracting data from models","Training a smaller 'student' model to mimic a larger 'teacher' model","Removing bias from models","Accelerating model training"],ans:1,exp:"Knowledge distillation trains compact student models to replicate large teacher model behavior — enabling efficient deployment."},
+  {cat:"Advanced AI",q:"Which technique helps reduce LLM bias and improve safety?",opts:["Increasing model size","RLHF (Reinforcement Learning from Human Feedback)","Adding more training data only","Reducing context window"],ans:1,exp:"RLHF trains LLMs based on human preference rankings, aligning model behavior with human values and safety guidelines."},
+  {cat:"Advanced AI",q:"What is 'Mixture of Experts' (MoE) in LLMs?",opts:["Multiple teams training one model","An architecture where only a subset of model parameters is activated per token","Training models on multiple datasets","A multi-agent framework"],ans:1,exp:"MoE routes each token to a subset of specialized 'expert' layers — enabling large model capacity with lower compute cost (e.g., GPT-4, Mixtral)."},
+  {cat:"Advanced AI",q:"What is the purpose of an 'attention mask' in transformers?",opts:["Hiding model parameters","Preventing the model from attending to certain positions (e.g., padding tokens)","Masking personal data in training","Filtering output content"],ans:1,exp:"Attention masks prevent the model from attending to irrelevant tokens (padding) or future tokens (causal masking in autoregressive models)."},
+  {cat:"Advanced AI",q:"What is 'Federated Learning'?",opts:["Learning from federal government data","Training models across decentralized data sources without sharing raw data","A cloud federation protocol","Multi-cloud model training"],ans:1,exp:"Federated Learning trains models on distributed devices/servers without centralizing sensitive data — key for privacy-preserving AI."},
+  {cat:"Advanced AI",q:"What is a 'knowledge graph' and its relevance to AI?",opts:["A chart of AI knowledge milestones","A structured graph of entities and relationships used to ground AI with factual knowledge","A type of neural network","A database indexing strategy"],ans:1,exp:"Knowledge graphs (like Google KG) encode real-world entities and relationships — used to ground LLMs with verified facts and reduce hallucinations."},
+  {cat:"Advanced AI",q:"What is 'Explainable AI' (XAI)?",opts:["AI that talks to users","Methods and techniques that make AI decision-making understandable to humans","AI with a simple UI","Fast AI inference"],ans:1,exp:"XAI provides interpretability into how AI models make decisions — critical for trust, compliance, and debugging in enterprise applications."},
+  {cat:"Advanced AI",q:"What is 'semantic search' vs keyword search?",opts:["They are identical","Semantic search understands meaning/intent; keyword search matches exact words","Keyword search is more accurate","Semantic search uses SQL"],ans:1,exp:"Semantic search uses embeddings to find conceptually relevant results even without exact keyword matches — powering modern RAG retrieval."},
+  {cat:"Advanced AI",q:"In the context of Capgemini's Buildathon, what best describes 'Agentic AI'?",opts:["AI that only generates text responses","AI that autonomously plans, reasons, uses tools, and executes multi-step tasks toward a goal","A simple rule-based chatbot","An AI that only classifies data"],ans:1,exp:"Agentic AI represents the next evolution — going beyond Q&A to autonomous goal-driven action using tools, planning, and self-correction."}
+];
+
+// ===== STATE =====
+let current = 0;
+let answers = new Array(100).fill(null);
+let scores = new Array(100).fill(null);
+
+// ===== TOPIC RENDER =====
+function renderTopics(){
+  const c = document.getElementById('topics-list');
+  c.innerHTML = topics.map((t,i)=>`
+    <div>
+      <div class="topic-head" onclick="toggleTopic(${i})">
+        <h3 style="color:${t.color}">${t.title}</h3>
+        <span id="arr-${i}" style="color:${t.color};font-size:18px">+</span>
+      </div>
+      <div class="topic-body" id="tb-${i}" style="display:none">
+        <ul>${t.points.map(p=>`<li>${p}</li>`).join('')}</ul>
+      </div>
+      ${i<topics.length-1?'<hr class="thin">':''}
+    </div>`).join('');
+  // Open first
+  toggleTopic(0);
+}
+function toggleTopic(i){
+  const b=document.getElementById('tb-'+i);
+  const a=document.getElementById('arr-'+i);
+  const open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  a.textContent=open?'+':'−';
+}
+
+// ===== PIPELINE RENDER =====
+const pipelineSteps=[
+  "Data Ingestion","Embedding","Vector Store","Query Parsing","Agent Planner","Tool Calling","LLM Reasoning","Output Delivery"
+];
+function renderPipeline(){
+  const c=document.getElementById('pipeline-viz');
+  c.innerHTML=pipelineSteps.map((s,i)=>
+    `<div class="pipe-step">${s}</div>${i<pipelineSteps.length-1?'<div class="pipe-arrow">→</div>':''}`
+  ).join('');
+  // Tools
+  const tools=[
+    {cat:"Agent Frameworks",items:["LangChain","LangGraph","AutoGen","CrewAI","AgentKit"]},
+    {cat:"Vector DBs",items:["Pinecone","Weaviate","ChromaDB","Milvus","Qdrant"]},
+    {cat:"LLM APIs",items:["OpenAI GPT-4o","Anthropic Claude","Google Gemini","Meta LLaMA","Mistral"]},
+    {cat:"Cloud Platforms",items:["AWS Bedrock","Azure OpenAI","Google Vertex AI","Hugging Face","Together AI"]},
+    {cat:"MLOps Tools",items:["MLflow","Weights & Biases","DVC","BentoML","Ray Serve"]},
+    {cat:"Databases",items:["PostgreSQL","MongoDB","Redis","Elasticsearch","Neo4j"]}
+  ];
+  document.getElementById('tools-grid').innerHTML=tools.map(t=>`
+    <div class="card" style="margin-bottom:.5rem">
+      <h3>${t.cat}</h3>
+      <div style="margin-top:6px">${t.items.map(i=>`<span class="tool-tag">${i}</span>`).join('')}</div>
+    </div>`).join('');
+  // Models
+  const models=[
+    {n:"GPT-4o",by:"OpenAI",type:"Multimodal"},
+    {n:"Claude 3.5 Sonnet",by:"Anthropic",type:"Long context"},
+    {n:"Gemini 1.5 Pro",by:"Google",type:"Multimodal"},
+    {n:"LLaMA 3",by:"Meta",type:"Open weight"},
+    {n:"Mistral Large",by:"Mistral AI",type:"Efficient"},
+    {n:"Copilot",by:"Microsoft",type:"Enterprise"}
+  ];
+  document.getElementById('model-grid').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">`+
+  models.map(m=>`<div style="background:var(--color-background-secondary,#f5f5f5);border-radius:8px;padding:10px 12px">
+    <div style="font-size:13px;font-weight:500">${m.n}</div>
+    <div style="font-size:11px;color:var(--color-text-secondary)">${m.by}</div>
+    <span class="tech-tag" style="margin-top:4px">${m.type}</span>
+  </div>`).join('') + '</div>';
+}
+
+// ===== MCQ RENDER =====
+function renderMCQ(){
+  const q=mcqs[current];
+  document.getElementById('q-counter').textContent=`Question ${current+1} / ${mcqs.length}`;
+  document.getElementById('q-cat').textContent=q.cat;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog-bar').style.width=((current+1)/mcqs.length*100)+'%';
+  const answered=answers.filter(a=>a!==null).length;
+  const correct=scores.filter(s=>s===1).length;
+  document.getElementById('score-val').textContent=Math.round(correct/Math.max(answered,1)*100)+'%';
+  document.getElementById('correct-val').textContent=correct;
+  document.getElementById('rem-val').textContent=mcqs.length-answered;
+  const optsDiv=document.getElementById('q-opts');
+  optsDiv.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.textContent=`${String.fromCharCode(65+i)}. ${o}`;
+    if(answers[current]!==null){
+      btn.disabled=true;
+      if(i===q.ans) btn.classList.add('correct');
+      else if(i===answers[current]) btn.classList.add('wrong');
+    }
+    btn.onclick=()=>selectAnswer(i);
+    optsDiv.appendChild(btn);
+  });
+  const expDiv=document.getElementById('q-exp');
+  if(answers[current]!==null){
+    expDiv.style.display='block';
+    expDiv.innerHTML=`<div class="exp">💡 ${q.exp}</div>`;
+  } else {
+    expDiv.style.display='none';
+  }
+}
+function selectAnswer(i){
+  if(answers[current]!==null) return;
+  answers[current]=i;
+  scores[current]=i===mcqs[current].ans?1:0;
+  renderMCQ();
+}
+function nextQ(){if(current<mcqs.length-1){current++;renderMCQ();}}
+function prevQ(){if(current>0){current--;renderMCQ();}}
+function skipQ(){nextQ();}
+function resetQ(){
+  if(!confirm('Reset all answers?')) return;
+  answers=new Array(100).fill(null);
+  scores=new Array(100).fill(null);
+  current=0;
+  renderMCQ();
+}
+
+// ===== TIPS RENDER =====
+function renderTips(){
+  const tips=[
+    {icon:"⏰",t:"Log in to Superset by 7:15 PM — 15 min early to avoid last-minute tech issues"},
+    {icon:"👥",t:"Individual scores aggregate to team score — everyone must participate actively"},
+    {icon:"🧠",t:"Focus areas: GenAI fundamentals, Agentic AI concepts, SQL basics, IT knowledge"},
+    {icon:"💡",t:"If unsure, eliminate 2 wrong answers first — often narrows to 50/50"},
+    {icon:"⚡",t:"Don't overthink — go with your first instinct on factual questions"},
+    {icon:"📱",t:"Coordinate with teammates on WeChat/WhatsApp — share answers for tricky questions"},
+    {icon:"🔋",t:"Charge your device fully before the quiz — don't risk battery cutoff"},
+    {icon:"🌐",t:"Ensure stable internet — use mobile hotspot as backup if WiFi is unreliable"}
+  ];
+  document.getElementById('tips-list').innerHTML=tips.map(t=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+      <span style="font-size:16px">${t.icon}</span>
+      <span style="font-size:13px;color:var(--color-text-primary);line-height:1.6">${t.t}</span>
+    </div>`).join('');
+  const areas=[
+    {area:"GenAI Basics",weight:"~30%",topics:"Transformers, prompting, RAG, hallucination, embeddings"},
+    {area:"Agentic AI",weight:"~25%",topics:"ReAct, LangChain, multi-agent, tool calling, memory"},
+    {area:"SQL / Data",weight:"~20%",topics:"Joins, window functions, CTEs, normalization, Text-to-SQL"},
+    {area:"Cloud & IT",weight:"~15%",topics:"AWS/Azure/GCP, containers, CI/CD, microservices, APIs"},
+    {area:"Capgemini Context",weight:"~10%",topics:"Company info, Buildathon rounds, program structure"}
+  ];
+  document.getElementById('test-areas').innerHTML=`<div style="margin-top:.5rem">`+areas.map(a=>`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);gap:8px">
+      <div>
+        <div style="font-size:13px;font-weight:500">${a.area}</div>
+        <div style="font-size:11px;color:var(--color-text-secondary)">${a.topics}</div>
+      </div>
+      <span style="font-size:12px;background:var(--c-primary-light);color:var(--c-primary);padding:3px 10px;border-radius:12px;white-space:nowrap;font-weight:500">${a.weight}</span>
+    </div>`).join('')+'</div>';
+}
+
+// ===== NAV =====
+function showTab(tab){
+  ['notes','pipeline','mcq','tips'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['notes','pipeline','mcq','tips'][i]===tab);
+  });
+}
+
+// ===== INIT =====
+renderTopics();
+renderPipeline();
+renderMCQ();
+renderTips();
+</script>
